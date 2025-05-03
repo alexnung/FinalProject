@@ -200,5 +200,353 @@ def manage_products():
     finally:
         connection.close()
 
+# 4. Orders Table
+@app.route('/api/orders', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_orders():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Orders;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['customer_id', 'status', 'total_amount', 'payment_status', 'shipping_address']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Orders (customer_id, status, total_amount, payment_status, shipping_address)
+            VALUES (%s, %s, %s, %s, %s);
+            """
+            cursor.execute(query, (
+                data['customer_id'], data['status'], data['total_amount'],
+                data['payment_status'], data['shipping_address']
+            ))
+            connection.commit()
+            return jsonify({'message': 'Order created successfully.', 'order_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            order_id = data.get('order_id')
+            if not order_id:
+                return error_response("Order ID is required for updating.")
+            query = """
+            UPDATE Orders
+            SET customer_id = %s, status = %s, total_amount = %s, payment_status = %s, shipping_address = %s
+            WHERE order_id = %s;
+            """
+            cursor.execute(query, (
+                data['customer_id'], data['status'], data['total_amount'],
+                data['payment_status'], data['shipping_address'], order_id
+            ))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Order not found.", 404)
+            return jsonify({'message': 'Order updated successfully.'})
+        elif request.method == 'DELETE':
+            order_id = request.args.get('order_id')
+            if not order_id:
+                return error_response("Order ID is required for deletion.")
+            query = "DELETE FROM Orders WHERE order_id = %s;"
+            cursor.execute(query, (order_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Order not found.", 404)
+            return jsonify({'message': 'Order deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing orders: {str(e)}")
+    finally:
+        connection.close()
+
+# 5. Order_Items Table
+@app.route('/api/order_items', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_order_items():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Order_Items;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['order_id', 'product_id', 'quantity', 'unit_price']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Order_Items (order_id, product_id, quantity, unit_price)
+            VALUES (%s, %s, %s, %s);
+            """
+            cursor.execute(query, (
+                data['order_id'], data['product_id'], data['quantity'], data['unit_price']
+            ))
+            connection.commit()
+            return jsonify({'message': 'Order item created successfully.', 'order_item_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            order_item_id = data.get('order_item_id')
+            if not order_item_id:
+                return error_response("Order item ID is required for updating.")
+            query = """
+            UPDATE Order_Items
+            SET order_id = %s, product_id = %s, quantity = %s, unit_price = %s
+            WHERE order_item_id = %s;
+            """
+            cursor.execute(query, (
+                data['order_id'], data['product_id'], data['quantity'],
+                data['unit_price'], order_item_id
+            ))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Order item not found.", 404)
+            return jsonify({'message': 'Order item updated successfully.'})
+        elif request.method == 'DELETE':
+            order_item_id = request.args.get('order_item_id')
+            if not order_item_id:
+                return error_response("Order item ID is required for deletion.")
+            query = "DELETE FROM Order_Items WHERE order_item_id = %s;"
+            cursor.execute(query, (order_item_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Order item not found.", 404)
+            return jsonify({'message': 'Order item deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing order items: {str(e)}")
+    finally:
+        connection.close()
+
+# 6. Stock_Transactions Table
+@app.route('/api/stock_transactions', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_stock_transactions():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Stock_Transactions;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['product_id', 'transaction_type', 'quantity', 'user_id']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Stock_Transactions (product_id, transaction_type, quantity, user_id, reason)
+            VALUES (%s, %s, %s, %s, %s);
+            """
+            cursor.execute(query, (
+                data['product_id'], data['transaction_type'], data['quantity'],
+                data['user_id'], data.get('reason')
+            ))
+            connection.commit()
+            return jsonify({'message': 'Stock transaction created successfully.', 'transaction_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            transaction_id = data.get('transaction_id')
+            if not transaction_id:
+                return error_response("Transaction ID is required for updating.")
+            query = """
+            UPDATE Stock_Transactions
+            SET product_id = %s, transaction_type = %s, quantity = %s, user_id = %s, reason = %s
+            WHERE transaction_id = %s;
+            """
+            cursor.execute(query, (
+                data['product_id'], data['transaction_type'], data['quantity'],
+                data['user_id'], data.get('reason'), transaction_id
+            ))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Stock transaction not found.", 404)
+            return jsonify({'message': 'Stock transaction updated successfully.'})
+        elif request.method == 'DELETE':
+            transaction_id = request.args.get('transaction_id')
+            if not transaction_id:
+                return error_response("Transaction ID is required for deletion.")
+            query = "DELETE FROM Stock_Transactions WHERE transaction_id = %s;"
+            cursor.execute(query, (transaction_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Stock transaction not found.", 404)
+            return jsonify({'message': 'Stock transaction deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing stock transactions: {str(e)}")
+    finally:
+        connection.close()
+
+# 7. Reports Table
+@app.route('/api/reports', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_reports():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Reports;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['report_type', 'user_id', 'report_data']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Reports (report_type, user_id, report_data)
+            VALUES (%s, %s, %s);
+            """
+            cursor.execute(query, (data['report_type'], data['user_id'], data['report_data']))
+            connection.commit()
+            return jsonify({'message': 'Report created successfully.', 'report_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            report_id = data.get('report_id')
+            if not report_id:
+                return error_response("Report ID is required for updating.")
+            query = """
+            UPDATE Reports
+            SET report_type = %s, user_id = %s, report_data = %s
+            WHERE report_id = %s;
+            """
+            cursor.execute(query, (data['report_type'], data['user_id'], data['report_data'], report_id))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Report not found.", 404)
+            return jsonify({'message': 'Report updated successfully.'})
+        elif request.method == 'DELETE':
+            report_id = request.args.get('report_id')
+            if not report_id:
+                return error_response("Report ID is required for deletion.")
+            query = "DELETE FROM Reports WHERE report_id = %s;"
+            cursor.execute(query, (report_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Report not found.", 404)
+            return jsonify({'message': 'Report deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing reports: {str(e)}")
+    finally:
+        connection.close()
+
+# 8. Transactions Table
+@app.route('/api/transactions', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_transactions():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Transactions;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['transaction_date', 'amount', 'user_id']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Transactions (transaction_date, amount, user_id, payment_method, transaction_status)
+            VALUES (%s, %s, %s, %s, %s);
+            """
+            cursor.execute(query, (
+                data['transaction_date'], data['amount'], data['user_id'], 
+                data.get('payment_method'), data.get('transaction_status')
+            ))
+            connection.commit()
+            return jsonify({'message': 'Transaction created successfully.', 'transaction_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            transaction_id = data.get('transaction_id')
+            if not transaction_id:
+                return error_response("Transaction ID is required for updating.")
+            query = """
+            UPDATE Transactions
+            SET transaction_date = %s, amount = %s, user_id = %s, payment_method = %s, transaction_status = %s
+            WHERE transaction_id = %s;
+            """
+            cursor.execute(query, (
+                data['transaction_date'], data['amount'], data['user_id'], 
+                data.get('payment_method'), data.get('transaction_status'), transaction_id
+            ))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Transaction not found.", 404)
+            return jsonify({'message': 'Transaction updated successfully.'})
+        elif request.method == 'DELETE':
+            transaction_id = request.args.get('transaction_id')
+            if not transaction_id:
+                return error_response("Transaction ID is required for deletion.")
+            query = "DELETE FROM Transactions WHERE transaction_id = %s;"
+            cursor.execute(query, (transaction_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Transaction not found.", 404)
+            return jsonify({'message': 'Transaction deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing transactions: {str(e)}")
+    finally:
+        connection.close()
+
+
+# 9. Invoices Table
+@app.route('/api/invoices', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_invoices():
+    connection = create_connection()
+    if not connection:
+        return error_response("Database connection failed.")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        if request.method == 'GET':
+            cursor.execute("SELECT * FROM Invoices;")
+            return jsonify(cursor.fetchall())
+        elif request.method == 'POST':
+            data = request.get_json()
+            required_fields = ['order_id', 'invoice_date', 'total_amount']
+            if not validate_data(data, required_fields):
+                return error_response("Missing required fields.")
+            query = """
+            INSERT INTO Invoices (order_id, invoice_date, total_amount, invoice_status, payment_due_date)
+            VALUES (%s, %s, %s, %s, %s);
+            """
+            cursor.execute(query, (
+                data['order_id'], data['invoice_date'], data['total_amount'], 
+                data.get('invoice_status'), data.get('payment_due_date')
+            ))
+            connection.commit()
+            return jsonify({'message': 'Invoice created successfully.', 'invoice_id': cursor.lastrowid}), 201
+        elif request.method == 'PUT':
+            data = request.get_json()
+            invoice_id = data.get('invoice_id')
+            if not invoice_id:
+                return error_response("Invoice ID is required for updating.")
+            query = """
+            UPDATE Invoices
+            SET order_id = %s, invoice_date = %s, total_amount = %s, invoice_status = %s, payment_due_date = %s
+            WHERE invoice_id = %s;
+            """
+            cursor.execute(query, (
+                data['order_id'], data['invoice_date'], data['total_amount'], 
+                data.get('invoice_status'), data.get('payment_due_date'), invoice_id
+            ))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Invoice not found.", 404)
+            return jsonify({'message': 'Invoice updated successfully.'})
+        elif request.method == 'DELETE':
+            invoice_id = request.args.get('invoice_id')
+            if not invoice_id:
+                return error_response("Invoice ID is required for deletion.")
+            query = "DELETE FROM Invoices WHERE invoice_id = %s;"
+            cursor.execute(query, (invoice_id,))
+            connection.commit()
+            if cursor.rowcount == 0:
+                return error_response("Invoice not found.", 404)
+            return jsonify({'message': 'Invoice deleted successfully.'})
+    except Error as e:
+        return error_response(f"Error managing invoices: {str(e)}")
+    finally:
+        connection.close()
+
 if __name__ == '__main__':
     app.run(debug=False)
