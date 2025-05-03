@@ -542,7 +542,7 @@ def manage_invoices():
             connection.commit()
             if cursor.rowcount == 0:
                 return error_response("Invoice not found.", 404)
-            return jsonify({'message': 'Invoice deleted successfully.'})
+            return jsonify({'message': 'Invoice deleted successfully.'})z
     except Error as e:
         return error_response(f"Error managing invoices: {str(e)}")
     finally:
