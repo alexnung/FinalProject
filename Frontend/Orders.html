@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products</title>
+    <title>Orders</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,7 +85,7 @@
             background-color: #0056b3;
         }
 
-        .product-container {
+        .order-container {
             padding: 2rem;
         }
 
@@ -143,9 +143,9 @@
     <div class="navbar">
         <ul>
             <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="orders.html">Orders</a></li>
+            <li><a href="orders.html" class="active-link">Orders</a></li>
             <li><a href="invoices.html">Invoices</a></li>
-            <li><a href="products.html" class="active-link">Products</a></li>
+            <li><a href="products.html">Products</a></li>
             <li><a href="inventory.html">Inventory</a></li>
             <li><a href="reports.html">Reports</a></li>
         </ul>
@@ -156,48 +156,41 @@
 
     <!-- Page Header -->
     <div class="page-header">
-        <h1>Products</h1>
-        <a href="#" class="new-btn">New Product</a>
+        <h1>Orders</h1>
+        <a href="#" class="new-btn">New Order</a>
     </div>
 
     <!-- Search Bar -->
-    <div class="product-container">
+    <div class="order-container">
         <div class="search-container">
-            <input type="text" class="searchBar" placeholder="Search products">
+            <input type="text" class="searchBar" placeholder="Search orders">
         </div>
 
-        <!-- Product Table -->
+        <!-- Orders Table -->
         <table class="results-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Inventory</th>
-                    <th>Published</th>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Cotton T-shirt</td>
-                    <td>T-Shirts</td>
-                    <td>$16.00</td>
-                    <td>120 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
+                    <td>001</td>
+                    <td>Jane Doe</td>
+                    <td>2025-05-01</td>
+                    <td>Completed</td>
+                    <td>$120.00</td>
                 </tr>
                 <tr>
-                    <td>Ripped Jeans</td>
-                    <td>Jeans</td>
-                    <td>$35.00</td>
-                    <td>45 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
-                </tr>
-                <tr>
-                    <td>Leather Jacket</td>
-                    <td>Jackets</td>
-                    <td>$90.00</td>
-                    <td>15 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
+                    <td>002</td>
+                    <td>John Smith</td>
+                    <td>2025-05-02</td>
+                    <td>Pending</td>
+                    <td>$65.00</td>
                 </tr>
             </tbody>
         </table>

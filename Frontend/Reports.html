@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Reports</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,19 +51,29 @@
             color: #fff;
         }
     
-        .dashboard-container {
+        .report-container {
             padding: 2rem;
         }
 
-        .dashboard-header {
+        .report-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .dashboard-header h1 {
+        .report-header h1 {
             font-size: 2rem;
             margin: 0;
+        }
+
+        .report-header .new-order-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .inventory-overview {
@@ -91,27 +101,27 @@
             font-weight: bold;
         }
 
-        .recent-activity {
+        .results-table {
             margin-top: 2rem;
         }
 
-        .recent-activity h2 {
+        .results-table h2 {
             font-size: 1.5rem;
         }
 
-        .recent-activity table {
+        .results-table table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
         }
 
-        .recent-activity th, .recent-activity td {
+        .results-table th, .results-table td {
             text-align: left;
             padding: 1rem;
             border-bottom: 1px solid #ddd;
         }
 
-        .recent-activity tr:hover {
+        .results-table tr:hover {
             background-color: #f1f1f1;
         }
 
@@ -129,80 +139,115 @@
             color: red;
             font-weight: bold;
         }
+        
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container input {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .published-btn {
+            padding: 0.5rem 1rem;
+            background-color: #e5f5e5;
+            color: green;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: default;
+        }
+        
+        .report-header {
+            padding: 1rem 2rem;
+            background-color: #f5f5f5; /* Matches the rest of the page */
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
     </style>
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
         <ul>
-            <li><a href="dashboard.html" class="active-link">Dashboard</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="orders.html">Orders</a></li>
             <li><a href="invoices.html">Invoices</a></li>
             <li><a href="products.html">Products</a></li>
             <li><a href="inventory.html">Inventory</a></li>
-            <li><a href="reports.html">Reports</a></li>
+            <li><a href="reports.html" class="active-link">Reports</a></li>
         </ul>
         <div class="user-menu">
-            <img src="profile-icon.png" alt="Profile" style="width:30px;height:30px;border-radius:50%;">
+            <img src="profile-icon.png" alt="Profile">
         </div>
     </div>
-
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <h1>Dashboard</h1>
+    
+    <div class="report-container">
+        <div class="report-header">
+            <h1>Reports</h1>
+            <button class="new-order-btn">New Report</button>
+        </div>
+      
+    <!-- Search Bar -->
+    <div class="product-container">
+        <div class="search-container">
+            <input type="text" class="searchBar" placeholder="Search reports">
         </div>
 
-        <div class="inventory-overview">
-            <div class="inventory-item">
-                <h3>Total inventory value</h3>
-                <p>$9,281.00</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Stock on hand</h3>
-                <p>1,235 items</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Low stock</h3>
-                <p>23 items</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Pending orders</h3>
-                <p>8 orders</p>
-            </div>
-        </div>
-
-        <div class="recent-activity">
+    <!-- Recent Activity -->
+    <div class="results-table">
             <h2>Recent Activity</h2>
-            <table>
+            <table class="recent-activity-table">
                 <thead>
                     <tr>
+                        <th>Report ID</th>
+                        <th>Type</th>
                         <th>Date</th>
-                        <th>Transaction</th>
-                        <th>Amount</th>
                         <th>Status</th>
+                        <th>Generated By</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Jun 23, 2023</td>
-                        <td>Order #12345</td>
-                        <td>$56.78</td>
-                        <td class="status-delivered">Delivered</td>
+                        <td>REP001</td>
+                        <td>Sales Summary</td>
+                        <td>2025-05-01</td>
+                        <td>Completed</td>
+                        <td>Admin</td>
                     </tr>
                     <tr>
-                        <td>Jun 22, 2023</td>
-                        <td>Order #12344</td>
-                        <td>$34.56</td>
-                        <td class="status-shipped">Shipped</td>
+                        <td>REP002</td>
+                        <td>Inventory Overview</td>
+                        <td>2025-05-02</td>
+                        <td>Pending</td>
+                        <td>John Doe</td>
                     </tr>
                     <tr>
-                        <td>Jun 21, 2023</td>
-                        <td>Return #12343</td>
-                        <td>-$12.34</td>
-                        <td class="status-refunded">Refunded</td>
+                        <td>REP003</td>
+                        <td>Customer Insights</td>
+                        <td>2025-05-03</td>
+                        <td>Completed</td>
+                        <td>Admin</td>
                     </tr>
                 </tbody>
             </table>
-        </div>
     </div>
+    </div>
+    </div>
+    <script src="JS/Search.js"></script>
 </body>
 </html>
