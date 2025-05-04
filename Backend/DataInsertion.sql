@@ -62,3 +62,16 @@ INSERT INTO Invoices (order_id, customer_id, total_amount, payment_status)
 VALUES 
     (1, 4, 1029.98, 'Paid'),
     (2, 4, 150.97, 'Paid');
+
+-- Inserting value into the new reorder_level field in products
+UPDATE Products
+SET reorder_level = 
+    CASE 
+        WHEN product_id = 1 THEN 5  -- Laptop
+        WHEN product_id = 2 THEN 10 -- Smartphone
+        WHEN product_id = 3 THEN 3  -- Office Chair
+        WHEN product_id = 4 THEN 2  -- Desk
+        WHEN product_id = 5 THEN 20 -- Notebook
+        WHEN product_id = 6 THEN 50 -- Pen
+        ELSE 0
+    END;

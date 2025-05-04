@@ -31,6 +31,10 @@ CREATE TABLE Products (
     FOREIGN KEY (category_id) REFERENCES Product_Categories(category_id)  -- Added foreign key for product category
 );
 
+-- Altering Products table to have a new field
+ALTER table products
+add reorder_level int;
+
 -- 4. Orders Table
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,6 +107,3 @@ CREATE TABLE Invoices (
     FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
-
-ALTER table products
-add reorder_level int;
