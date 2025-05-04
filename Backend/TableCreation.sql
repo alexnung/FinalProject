@@ -49,6 +49,54 @@ CREATE TABLE Orders (
     FOREIGN KEY (customer_id) REFERENCES Users(user_id)
 );
 
+-- Creating a trigger to autocreate an invoice once and order has been made
+DELIMITER $$
+
+CREATE TRIGGER after_order_insert
+AFTER INSERT ON `inventorymanagement`.`orders`
+FOR EACH ROW
+BEGIN
+    -- Insert the invoice for the newly created order
+    INSERT INTO `inventorymanagement`.`invoices` (
+        `order_id`, 
+        `customer_id`, 
+        `invoice_date`, 
+        `total_amount`, 
+        `payment_status`
+    ) VALUES (
+        NEW.order_id,                -- Copy over order ID
+        NEW.customer_id,             -- Copy over customer ID
+        NEW.order_date,              -- Use the order date as the invoice date
+        NEW.total_amount,            -- Copy over total amount from the order
+        NEW.payment_status           -- Copy over payment status from the order
+    );
+
+    -- Update the formatted_invoice_id in the newly created invoice
+    UPDATE `inventorymanagement`.`invoices`
+    SET formatted_invoice_id = CONCAT('INV', LPAD(LAST_INSERT_ID(), 5, '0'))
+    WHERE invoice_id = LAST_INSERT_ID();
+END $$
+
+DELIMITER ;
+
+-- Creating a trigger updating an invoice when an order is updated
+DELIMITER $$
+
+CREATE TRIGGER update_invoice_after_order_update
+AFTER UPDATE ON orders
+FOR EACH ROW
+BEGIN
+    -- Update the corresponding invoice if the order changes
+    UPDATE invoices
+    SET 
+        customer_id = NEW.customer_id,
+        total_amount = NEW.total_amount,
+        payment_status = NEW.payment_status
+    WHERE order_id = NEW.order_id;
+END$$
+
+DELIMITER ;
+
 -- 5. Order_Items Table (Many-to-many relationship between Orders and Products)
 CREATE TABLE Order_Items (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,

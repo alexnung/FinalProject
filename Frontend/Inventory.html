@@ -169,32 +169,20 @@
         <!-- Inventory Table -->
         <table class="results-table">
             <thead>
-                <tr>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Stock Quantity</th>
-                    <th>Reorder Level</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1001</td>
-                    <td>Cotton T-shirt</td>
-                    <td>T-Shirts</td>
-                    <td>120</td>
-                    <td>50</td>
-                </tr>
-                <tr>
-                    <td>1002</td>
-                    <td>Ripped Jeans</td>
-                    <td>Jeans</td>
-                    <td>45</td>
-                    <td>20</td>
-                </tr>
-            </tbody>
+		        <tr>
+		            <th>Product ID</th>
+		            <th>Product Name</th>
+		            <th>Category</th>
+		            <th>Stock Quantity</th>
+		            <th>Reorder Level</th>
+		        </tr>
+		    </thead>
+		    <tbody id="inventory-table-body">
+		        <!-- Rows will be dynamically populated here -->
+		    </tbody>
         </table>
     </div>
-    <script src="JS/Search.js"></script>
+    <script src="JS/search.js"></script>
+    <script src="JS/inventory.js"></script>
 </body>
 </html>

@@ -92,7 +92,7 @@ def manage_users():
         connection.close()
 
 # 2. Product_Categories Table
-@app.route('/api/categories', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/api/product_categories', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def manage_categories():
     connection = create_connection()
     if not connection:
