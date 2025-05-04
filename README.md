@@ -72,6 +72,7 @@ The Inventory Management System simplifies inventory tracking, user management, 
    ```bash
    Run "pip install flask"
    Run "pip install flask mysql-connector-python"
+   Run "pip install flask-cors"
 
 4. Setup database:
    Run  TableCreation.sql code in MySQL Workbench

@@ -169,32 +169,22 @@
         <!-- Orders Table -->
         <table class="results-table">
             <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer Name</th>
-                    <th>Order Date</th>
-                    <th>Status</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>001</td>
-                    <td>Jane Doe</td>
-                    <td>2025-05-01</td>
-                    <td>Completed</td>
-                    <td>$120.00</td>
-                </tr>
-                <tr>
-                    <td>002</td>
-                    <td>John Smith</td>
-                    <td>2025-05-02</td>
-                    <td>Pending</td>
-                    <td>$65.00</td>
-                </tr>
-            </tbody>
-        </table>
+            <tr>
+                <th>Order ID</th>
+                <th>Order Date</th>
+                <th>Customer ID</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+                <th>Payment Status</th>
+                <th>Shipping Address</th>
+            </tr>
+	        </thead>
+	        <tbody id="orders-table-body">
+	            <!-- Orders will be dynamically populated here -->
+	        </tbody>
+	    </table>
     </div>
-    <script src="JS/Search.js"></script>
+    <script src="JS/search.js"></script>
+    <script src="JS/orders.js"></script>
 </body>
 </html>

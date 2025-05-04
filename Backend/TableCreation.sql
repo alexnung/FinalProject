@@ -103,3 +103,6 @@ CREATE TABLE Invoices (
     FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
+
+ALTER table products
+add reorder_level int;

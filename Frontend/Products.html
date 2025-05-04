@@ -169,39 +169,23 @@
         <!-- Product Table -->
         <table class="results-table">
             <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Inventory</th>
-                    <th>Published</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Cotton T-shirt</td>
-                    <td>T-Shirts</td>
-                    <td>$16.00</td>
-                    <td>120 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
-                </tr>
-                <tr>
-                    <td>Ripped Jeans</td>
-                    <td>Jeans</td>
-                    <td>$35.00</td>
-                    <td>45 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
-                </tr>
-                <tr>
-                    <td>Leather Jacket</td>
-                    <td>Jackets</td>
-                    <td>$90.00</td>
-                    <td>15 in stock</td>
-                    <td><button class="published-btn">Published</button></td>
-                </tr>
-            </tbody>
+		        <tr>
+		            <th>Product ID</th>
+		            <th>Product Name</th>
+		            <th>Description</th>
+		            <th>Quantity in Stock</th>
+		            <th>Unit Price</th>
+		            <th>Category ID</th>
+		            <th>Created At</th>
+		            <th>Updated At</th>
+		        </tr>
+		    </thead>
+		    <tbody id="products-table-body">
+		        <!-- Rows will be dynamically populated -->
+		    </tbody>
         </table>
     </div>
-    <script src="JS/Search.js"></script>
+    <script src="JS/search.js"></script>
+    <script src="JS/products.js"></script>
 </body>
 </html>

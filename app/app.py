@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request
 import mysql.connector
 from mysql.connector import Error
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 # Utility function to create a database connection
 def create_connection():
@@ -542,7 +545,7 @@ def manage_invoices():
             connection.commit()
             if cursor.rowcount == 0:
                 return error_response("Invoice not found.", 404)
-            return jsonify({'message': 'Invoice deleted successfully.'})z
+            return jsonify({'message': 'Invoice deleted successfully.'})
     except Error as e:
         return error_response(f"Error managing invoices: {str(e)}")
     finally:
