@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5; /* Grey background for entire page */
+        }
+
+        .navbar {
+            background-color: #fff; /* White toolbar */
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar ul li {
+            display: inline;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .navbar ul li a:hover {
+            background-color: #f1f1f1;
+            color: #007bff;
+        }
+
+        .navbar ul li a.active-link {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .navbar .user-menu img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .page-header {
+            padding: 1rem 2rem;
+            background-color: #f5f5f5; /* Matches the rest of the page */
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .page-header .new-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .page-header .new-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .product-container {
+            padding: 2rem;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-table th, .product-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .product-table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        .product-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container input {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .published-btn {
+            padding: 0.5rem 1rem;
+            background-color: #e5f5e5;
+            color: green;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="orders.html">Orders</a></li>
+            <li><a href="invoices.html">Invoices</a></li>
+            <li><a href="products.html" class="active-link">Products</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+            <li><a href="reports.html">Reports</a></li>
+        </ul>
+        <div class="user-menu">
+            <img src="profile-icon.png" alt="Profile">
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Products</h1>
+        <a href="#" class="new-btn">New Product</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="product-container">
+        <div class="search-container">
+            <input type="text" placeholder="Search products">
+        </div>
+
+        <!-- Product Table -->
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Inventory</th>
+                    <th>Published</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cotton T-shirt</td>
+                    <td>T-Shirts</td>
+                    <td>$16.00</td>
+                    <td>120 in stock</td>
+                    <td><button class="published-btn">Published</button></td>
+                </tr>
+                <tr>
+                    <td>Ripped Jeans</td>
+                    <td>Jeans</td>
+                    <td>$35.00</td>
+                    <td>45 in stock</td>
+                    <td><button class="published-btn">Published</button></td>
+                </tr>
+                <tr>
+                    <td>Leather Jacket</td>
+                    <td>Jackets</td>
+                    <td>$90.00</td>
+                    <td>15 in stock</td>
+                    <td><button class="published-btn">Published</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
