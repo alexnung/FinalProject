@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Low stock (products with stock less than 50% of reorder level)
             const lowStock = products.filter(product => product.quantity_in_stock <= product.reorder_level * 0.5).length;
 
+            // Out of stock (products with zero quantity in stock)
+            const outOfStock = products.filter(product => product.quantity_in_stock === 0).length;
+
             // Pending orders (orders with status 'Pending')
             const pendingOrders = orders.filter(order => order.status === 'Pending').length;
 
@@ -34,11 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('total-inventory-value').textContent = `$${totalInventoryValue}`;
             document.getElementById('stock-on-hand').textContent = `${stockOnHand} items`;
             document.getElementById('low-stock').textContent = `${lowStock} items`;
+            document.getElementById('out-of-stock').textContent = `${outOfStock} items`;
             document.getElementById('pending-orders').textContent = `${pendingOrders} orders`;
-
-            // Display recent orders on the dashboard
-            const recentOrdersTable = document.getElementById('recent-orders-table-body');
-            recentOrdersTable.innerHTML = ''; // Clear previous rows
 
             // Sort the orders by order_date (most recent first)
             orders.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
@@ -54,18 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${order.total_amount}</td>
                     <td>${order.status}</td>
                 `;
-                recentOrdersTable.appendChild(row);
-            });
-
-            // Display recent activity in the dashboard's activity section
-            const recentActivityList = document.getElementById('recent-activity-list');
-            recentActivityList.innerHTML = ''; // Clear previous activity
-
-            // Add the recent orders to the activity list (descending order of order_date)
-            recentOrders.forEach(order => {
-                const activityItem = document.createElement('li');
-                activityItem.textContent = `Order ID: ${order.order_id} - Date: ${new Date(order.order_date).toLocaleDateString()} - Amount: $${order.total_amount} - Status: ${order.status}`;
-                recentActivityList.appendChild(activityItem);
             });
 
         } catch (error) {
