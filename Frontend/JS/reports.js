@@ -28,12 +28,24 @@ document.addEventListener('DOMContentLoaded', () => {
             reports.forEach((report) => {
                 const row = document.createElement('tr');
 
+                // Format `report_data` as plain text
+                const formattedReportData = Object.entries(JSON.parse(report.report_data || '{}'))
+                    .map(([key, value]) => {
+                        // Capitalize keys and format them
+                        const formattedKey = key
+                            .split('_')
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        return `${formattedKey}: ${value}`;
+                    })
+                    .join(', ');
+
                 row.innerHTML = `
                     <td>${report.report_id}</td>
                     <td>${report.report_type}</td>
                     <td>${new Date(report.generated_at).toLocaleDateString()} ${new Date(report.generated_at).toLocaleTimeString()}</td>
                     <td>${userMap[report.user_id] || 'Unknown User'}</td>
-                    <td>${report.report_data}</td>
+                    <td>${formattedReportData || 'No Data'}</td>
                 `;
 
                 tableBody.appendChild(row);

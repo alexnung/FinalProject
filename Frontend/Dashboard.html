@@ -152,57 +152,45 @@
         </div>
 
         <div class="inventory-overview">
-            <div class="inventory-item">
-                <h3>Total inventory value</h3>
-                <p>$9,281.00</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Stock on hand</h3>
-                <p>1,235 items</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Low stock</h3>
-                <p>23 items</p>
-            </div>
-            <div class="inventory-item">
-                <h3>Pending orders</h3>
-                <p>8 orders</p>
-            </div>
-        </div>
+		    <div class="inventory-item">
+		        <h3>Total inventory value</h3>
+		        <p id="total-inventory-value">Loading...</p>
+		    </div>
+		    <div class="inventory-item">
+		        <h3>Stock on hand</h3>
+		        <p id="stock-on-hand">Loading...</p>
+		    </div>
+		    <div class="inventory-item">
+		        <h3>Low stock</h3>
+		        <p id="low-stock">Loading...</p>
+		    </div>
+		    <div class="inventory-item">
+		        <h3>Out of stock</h3>
+		        <p id="out-of-stock">Loading...</p>
+		    </div>
+		    <div class="inventory-item">
+		        <h3>Pending orders</h3>
+		        <p id="pending-orders">Loading...</p>
+		    </div>
+		</div>
 
         <div class="recent-activity">
             <h2>Recent Activity</h2>
             <table>
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Transaction</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Jun 23, 2023</td>
-                        <td>Order #12345</td>
-                        <td>$56.78</td>
-                        <td class="status-delivered">Delivered</td>
-                    </tr>
-                    <tr>
-                        <td>Jun 22, 2023</td>
-                        <td>Order #12344</td>
-                        <td>$34.56</td>
-                        <td class="status-shipped">Shipped</td>
-                    </tr>
-                    <tr>
-                        <td>Jun 21, 2023</td>
-                        <td>Return #12343</td>
-                        <td>-$12.34</td>
-                        <td class="status-refunded">Refunded</td>
-                    </tr>
-                </tbody>
+			        <tr>
+			            <th>Order ID</th>
+			            <th>Order Date</th>
+			            <th>Total Amount</th>
+			            <th>Status</th>
+			        </tr>
+			    </thead>
+			    <tbody id="orders-table-body">
+			        <!-- Orders will be populated here -->
+			    </tbody>
             </table>
         </div>
     </div>
+    <script src="JS/dashboard.js"></script>
 </body>
 </html>
