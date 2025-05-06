@@ -64,252 +64,162 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndPopulateOrders();
 });
 
-let products = []; // Store available products fetched from backend
-let orders = []; // Store existing orders for updating
-let orderItems = []; // Temporary store for items in the order
+	let products = []; // Store available products fetched from backend
+	let orderItems = []; // Temporary store for items in the order
+	
+	// Toggle the visibility of the Create Order form
+	function toggleCreateOrderForm() {
+	    const createOrderForm = document.getElementById("create-order-form");
+	
+	    // Check the current state of the form visibility
+	    if (createOrderForm.style.display === "none" || createOrderForm.style.display === "") {
+	        fetchProducts(); // Fetch products before displaying the form
+	        createOrderForm.style.display = "block"; // Show the form
+	    } else {
+	        createOrderForm.style.display = "none"; // Hide the form
+	    }
+	}
+	
+	// Fetch available products from the database
+	function fetchProducts() {
+	    fetch('http://127.0.0.1:5000/api/products') // Replace with your backend API URL
+	        .then(response => response.json())
+	        .then(data => {
+	            products = data;
+	            populateProductSelect();
+	        })
+	        .catch(error => console.error("Error fetching products:", error));
+	}
+	
+	// Populate product dropdown options dynamically
+	function populateProductSelect() {
+	    const productSelect = document.getElementById("product_id");
+	
+	    if (!productSelect) {
+	        console.error("product_id element is missing in the HTML.");
+	        return;
+	    }
+	
+	    // Clear previous options
+	    productSelect.innerHTML = "";
+	
+	    // Add default option
+	    const defaultOption = document.createElement("option");
+	    defaultOption.value = "";
+	    defaultOption.textContent = "Select a product";
+	    productSelect.appendChild(defaultOption);
+	
+	    // Add product options dynamically
+	    products.forEach(product => {
+	        const option = document.createElement("option");
+	        option.value = product.product_id;
+	        option.textContent = `${product.product_name} - $${product.unit_price}`;
+	        productSelect.appendChild(option);
+	    });
+	}
+	
+	// Add item to the order in the Create Order form
+	function addItem() {
+	    const productId = parseInt(document.getElementById("product_id").value);
+	    const quantity = parseInt(document.getElementById("quantity").value);
+	    const product = products.find(p => p.product_id === productId);
+	
+	    if (product && quantity > 0) {
+	        const subtotal = product.unit_price * quantity;
+	        orderItems.push({ product, quantity, subtotal });
+	        updateOrderItemsList();
+	        updateTotalAmount();
+	    } else {
+	        alert("Invalid product or quantity.");
+	    }
+	}
+	
+	// Update the list of items in the order
+	function updateOrderItemsList() {
+	    const orderItemsList = document.getElementById("orderItemsList");
+	
+	    // Clear the current list
+	    orderItemsList.innerHTML = "";
+	
+	    // Add the items to the list dynamically
+	    orderItems.forEach(item => {
+	        const li = document.createElement("li");
+	        li.textContent = `${item.product.product_name} x${item.quantity} - $${item.subtotal.toFixed(2)}`;
+	        orderItemsList.appendChild(li);
+	    });
+	}
+	
+	// Calculate total amount for the order
+	function updateTotalAmount() {
+	    const totalAmount = orderItems.reduce((total, item) => total + item.subtotal, 0);
+	    document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
+	}
+	
+	// Handle order creation
+	document.getElementById("createOrderForm").addEventListener("submit", async function (e) {
+	    e.preventDefault(); // Prevent the default form submission behavior
 
-// Fetch available products from the database when creating/updating an order
-function fetchProducts() {
-    fetch('http://127.0.0.1:5000/api/products')  // Your backend API for fetching products
-        .then(response => response.json())
-        .then(data => {
-            products = data;
-            populateProductSelect();
-        })
-        .catch(error => console.error("Error fetching products:", error));
-}
+	    const customerId = document.getElementById("customer_id").value.trim();
+	    const shippingAddress = document.getElementById("shipping_address").value.trim();
+	    const status = document.getElementById("status").value.trim();
+	    const paymentStatus = document.getElementById("payment_status").value.trim();
 
-// Fetch existing orders when updating an order
-function fetchOrders() {
-    fetch('http://127.0.0.1:5000/api/orders')  // Your backend API for fetching orders
-        .then(response => response.json())
-        .then(data => {
-            orders = data;
-            populateOrderSelect();
-        })
-        .catch(error => console.error("Error fetching orders:", error));
-}
+	    // Check for missing fields
+	    if (!customerId || !shippingAddress || !status || !paymentStatus) {
+	        alert("Please fill out all required fields.");
+	        return;
+	    }
 
-// Populate product select options dynamically
-function populateProductSelect() {
-    const productSelect = document.getElementById("product_id");
-    const updateProductSelect = document.getElementById("update_product_id");
+	    // Check if there are any items in the order
+	    if (orderItems.length === 0) {
+	        alert("Please add at least one product to the order.");
+	        return;
+	    }
 
-    // Clear previous options
-    productSelect.innerHTML = "";
-    updateProductSelect.innerHTML = "";
+	    // Prepare the order data
+	    const orderData = {
+	        customer_id: customerId,
+	        shipping_address: shippingAddress,
+	        status: status,
+	        payment_status: paymentStatus,
+	        items: orderItems.map(item => ({
+	            product_id: item.product.product_id, 
+	            quantity: item.quantity,
+	            subtotal: item.subtotal
+	        })),
+	        total_amount: orderItems.reduce((total, item) => total + item.subtotal, 0),
+	    };
 
-    // Add default option to the select dropdowns
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "Select a product";
-    productSelect.appendChild(defaultOption);
-    updateProductSelect.appendChild(defaultOption.cloneNode(true));
+	    // Log the order data to debug
+	    console.log("Order Data:", orderData);
 
-    // Add product options dynamically
-    products.forEach(product => {
-        const option = document.createElement("option");
-        option.value = product.product_id;
-        option.textContent = `${product.product_name} - $${product.unit_price}`;
-        productSelect.appendChild(option);
-        updateProductSelect.appendChild(option.cloneNode(true));
-    });
-}
+	    try {
+	        const response = await fetch('http://127.0.0.1:5000/api/orders', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify(orderData),
+	        });
 
-// Populate existing order select options dynamically (for update)
-function populateOrderSelect() {
-    const orderSelect = document.getElementById("existing_order_id");
+	        if (!response.ok) {
+	            const errorData = await response.json();
+	            console.error("Error response from server:", errorData);
+	            throw new Error(errorData.message || "Failed to create order.");
+	        }
 
-    // Clear previous options
-    orderSelect.innerHTML = "";
+	        const result = await response.json();
+	        alert("Order Created Successfully!");
+	        console.log("Order Details:", result);
 
-    // Add default option
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "Select an order";
-    orderSelect.appendChild(defaultOption);
+	        // Reset the form
+	        document.getElementById("createOrderForm").reset();
+	        orderItems = [];
+	        updateOrderItemsList();
+	        updateTotalAmount();
+	        toggleCreateOrderForm(); // Hide the form after successful creation
+	    } catch (error) {
+	        console.error("Error creating order:", error);
+	        alert(`Failed to create the order: ${error.message}`);
+	    }
+	});
 
-    // Add order options dynamically
-    orders.forEach(order => {
-        const option = document.createElement("option");
-        option.value = order.order_id;
-        option.textContent = `Order ID: ${order.order_id} - ${order.status}`;
-        orderSelect.appendChild(option);
-    });
-}
 
-// Show the Create Order Form and populate the product dropdown
-document.getElementById("createOrderBtn").addEventListener("click", function() {
-    fetchProducts();  // Fetch products for creating an order
-    toggleForm('create-order-form');  // Show the form
-});
-
-// Show the Update Order Form and populate the existing orders and product dropdown
-document.getElementById("updateOrderBtn").addEventListener("click", function() {
-    fetchOrders();  // Fetch existing orders for updating
-    fetchProducts();  // Fetch products for updating an order
-    toggleForm('update-order-form');  // Show the form
-});
-
-// Add item to the order in the Create Order form
-function addItem() {
-    const productId = parseInt(document.getElementById("product_id").value);
-    const quantity = parseInt(document.getElementById("quantity").value);
-    const product = products.find(p => p.product_id === productId);
-    
-    if (product && quantity > 0) {
-        const subtotal = product.unit_price * quantity;
-        orderItems.push({ product, quantity, subtotal });
-        updateOrderItemsList();
-        updateTotalAmount();
-    } else {
-        alert("Invalid product or quantity.");
-    }
-}
-
-// Add or update an item in the order in the Update Order form
-function updateItem() {
-    const orderId = parseInt(document.getElementById("existing_order_id").value);
-    const shippingAddress = document.getElementById("update_shipping_address").value;
-    const status = document.getElementById("update_status").value;
-    const paymentStatus = document.getElementById("update_payment_status").value;
-
-    const productId = parseInt(document.getElementById("update_product_id").value);
-    const quantity = parseInt(document.getElementById("update_quantity").value);
-    
-    const product = products.find(p => p.product_id === productId);
-    if (product && quantity > 0) {
-        const subtotal = product.unit_price * quantity;
-
-        // Check if the item already exists in the order
-        let existingItem = orderItems.find(item => item.product.product_id === productId);
-        if (existingItem) {
-            existingItem.quantity = quantity;
-            existingItem.subtotal = subtotal;
-        } else {
-            orderItems.push({ product, quantity, subtotal });
-        }
-
-        updateOrderItemsList();
-        updateTotalAmount();
-    } else {
-        alert("Invalid product or quantity.");
-    }
-}
-
-// Delete an item from the order in the Update Order form
-function deleteItem(productId) {
-    const itemIndex = orderItems.findIndex(item => item.product.product_id === productId);
-    if (itemIndex !== -1) {
-        orderItems.splice(itemIndex, 1);  // Remove item from the order
-        updateOrderItemsList();
-        updateTotalAmount();
-    }
-}
-
-// Update the list of items in the order (both for Create and Update Order)
-function updateOrderItemsList() {
-    const orderItemsList = document.getElementById("orderItemsList");
-    const updateOrderItemsList = document.getElementById("updateOrderItemsList");
-
-    // Clear the current list
-    orderItemsList.innerHTML = "";
-    updateOrderItemsList.innerHTML = "";
-
-    // Add the items to the lists dynamically
-    orderItems.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = `${item.product.product_name} x${item.quantity} - $${item.subtotal.toFixed(2)}`;
-
-        // Add a delete button for update orders
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
-        deleteButton.onclick = () => deleteItem(item.product.product_id);  // Delete functionality
-        li.appendChild(deleteButton);
-
-        orderItemsList.appendChild(li);
-        updateOrderItemsList.appendChild(li.cloneNode(true));  // For the Update Order list
-    });
-}
-
-// Calculate total amount for the order
-function updateTotalAmount() {
-    const totalAmount = orderItems.reduce((total, item) => total + item.subtotal, 0);
-    document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
-    document.getElementById("updateTotalAmount").textContent = totalAmount.toFixed(2);  // For Update Order
-}
-
-// Handle order creation
-document.getElementById("createOrderForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const customerId = document.getElementById("customer_id").value;
-    const shippingAddress = document.getElementById("shipping_address").value;
-    const status = document.getElementById("status").value;
-    const paymentStatus = document.getElementById("payment_status").value;
-
-    const orderData = {
-        customer_id: customerId,
-        shipping_address: shippingAddress,
-        status: status,
-        payment_status: paymentStatus,
-        items: orderItems,
-        total_amount: orderItems.reduce((total, item) => total + item.subtotal, 0)
-    };
-
-    fetch('/api/createOrder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("Order Created Successfully!");
-        // Reset the form
-        document.getElementById("createOrderForm").reset();
-        orderItems = [];
-        updateOrderItemsList();
-        updateTotalAmount();
-        toggleForm('create-order-form');  // Close form after creation
-    });
-});
-
-// Handle updating an existing order
-document.getElementById("updateOrderForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const orderId = parseInt(document.getElementById("existing_order_id").value);
-    const shippingAddress = document.getElementById("update_shipping_address").value;
-    const status = document.getElementById("update_status").value;
-    const paymentStatus = document.getElementById("update_payment_status").value;
-
-    const orderData = {
-        order_id: orderId,
-        shipping_address: shippingAddress,
-        status: status,
-        payment_status: paymentStatus,
-        items: orderItems,
-        total_amount: orderItems.reduce((total, item) => total + item.subtotal, 0)
-    };
-
-    fetch(`/api/updateOrder/${orderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("Order Updated Successfully!");
-        // Reset the form
-        orderItems = [];
-        updateOrderItemsList();
-        updateTotalAmount();
-        toggleForm('update-order-form');  // Close form after update
-    });
-});
-
-// Toggle visibility of a form
-function toggleForm(formId) {
-    const form = document.getElementById(formId);
-    form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
-}

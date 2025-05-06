@@ -45,8 +45,7 @@ CREATE TABLE Orders (
     payment_status ENUM('Paid', 'Pending') NOT NULL,
     shipping_address TEXT NOT NULL
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Users(user_id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Creating a trigger to autocreate an invoice once and order has been made
@@ -127,6 +126,5 @@ CREATE TABLE Invoices (
     invoice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date the invoice is generated
     total_amount DECIMAL(10, 2) NOT NULL, -- Total amount of the invoice
     payment_status ENUM('Paid', 'Pending') NOT NULL, -- Payment status of the invoice
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE
 );
