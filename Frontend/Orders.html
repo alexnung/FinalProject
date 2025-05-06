@@ -158,82 +158,105 @@
     <div class="page-header">
         <h1>Orders</h1>
         <div>
-        <button id="createOrderBtn" class="btn">Create Order</button>
-		<button id="updateOrderBtn" class="btn">Update Order</button>
+        <button id="createOrderBtn" class="new-btn">Create Order</button>
+		<button id="updateOrderBtn" class="new-btn">Update Order</button>
         </div>
     </div>
     
-    <!-- Order Form -->
-	<div id="orderForm" class="form-container" style="display: none;">
-	    <h2 id="formTitle">Order Form</h2>
-	    <form id="orderFormElement">
-	        <label for="customerId">Customer ID:</label>
-	        <input type="number" id="customerId" name="customerId" required>
-	        
-	        <label for="status">Status:</label>
-	        <select id="status" name="status">
-	            <option value="Pending">Pending</option>
-	            <option value="Completed">Completed</option>
-	            <option value="Cancelled">Cancelled</option>
-	        </select>
+    <!-- Create Order Form -->
+	<div id="create-order-form" style="display: none;">
+	    <h2>Create Order</h2>
+	    <form id="createOrderForm">
+	        <label for="customer_id">Customer ID:</label>
+	        <input type="number" id="customer_id" name="customer_id" required><br><br>
 	
-	        <label for="paymentStatus">Payment Status:</label>
-	        <select id="paymentStatus" name="paymentStatus">
-	            <option value="Unpaid">Unpaid</option>
-	            <option value="Paid">Paid</option>
-	            <option value="Refunded">Refunded</option>
-	        </select>
+	        <label for="shipping_address">Shipping Address:</label>
+	        <textarea id="shipping_address" name="shipping_address" required></textarea><br><br>
 	
-	        <label for="shippingAddress">Shipping Address:</label>
-	        <input type="text" id="shippingAddress" name="shippingAddress" required>
-	
-	        <h3>Order Items</h3>
-	        <div id="orderItemsContainer"></div>
-	        <button type="button" id="addOrderItemBtn">Add Item</button>
-	
-	        <div class="form-actions">
-	            <button type="submit" id="saveOrderBtn">Save</button>
-	            <button type="button" id="cancelOrderBtn">Cancel</button>
-	        </div>
-	    </form>
-	</div>
-    
-	<!-- Modal or Form to Create/Update Order -->
-	<div id="orderForm" style="display: none;">
-	    <h3 id="formTitle">Create Order</h3>
-	    <form id="orderFormElement">
-	        <label for="orderId">Order ID (for update only):</label>
-	        <select id="orderId" name="orderId">
-	            <!-- Existing Order IDs will be populated here -->
-	        </select><br>
-	
-	        <label for="customerId">Customer ID:</label>
-	        <input type="number" id="customerId" name="customerId" required><br>
-	
-	        <label for="status">Status:</label>
-	        <select id="status" name="status">
+	        <label for="status">Order Status:</label>
+	        <select id="status" name="status" required>
 	            <option value="Pending">Pending</option>
 	            <option value="Shipped">Shipped</option>
 	            <option value="Delivered">Delivered</option>
-	        </select><br>
+	            <option value="Cancelled">Cancelled</option>
+	        </select><br><br>
 	
-	        <label for="paymentStatus">Payment Status:</label>
-	        <select id="paymentStatus" name="paymentStatus">
+	        <label for="payment_status">Payment Status:</label>
+	        <select id="payment_status" name="payment_status" required>
 	            <option value="Paid">Paid</option>
 	            <option value="Pending">Pending</option>
-	        </select><br>
+	        </select><br><br>
 	
-	        <label for="shippingAddress">Shipping Address:</label>
-	        <textarea id="shippingAddress" name="shippingAddress" required></textarea><br>
+	        <label for="product_id">Product:</label>
+	        <select id="product_id" name="product_id" required>
+	            <!-- Options will be populated dynamically -->
+	        </select><br><br>
 	
-	        <h4>Order Items:</h4>
-	        <div id="orderItemsContainer">
-	            <!-- Order Items will be populated here -->
-	        </div>
+	        <label for="quantity">Quantity:</label>
+	        <input type="number" id="quantity" name="quantity" required><br><br>
 	
-	        <button type="submit">Save</button>
+	        <button type="button" onclick="addItem()">Add Item</button><br><br>
+	
+	        <h3>Order Items:</h3>
+	        <ul id="orderItemsList">
+	            <!-- Items will be dynamically added here -->
+	        </ul>
+	
+	        <h3>Total Amount: <span id="totalAmount">0.00</span></h3>
+	
+	        <button type="submit">Create Order</button>
+	        <button type="button" onclick="toggleForm('create-order-form')">Close</button>
 	    </form>
 	</div>
+	
+	<!-- Update Order Form -->
+	<div id="update-order-form" style="display: none;">
+	    <h2>Update Order</h2>
+	    <form id="updateOrderForm">
+	        <label for="existing_order_id">Order ID:</label>
+	        <select id="existing_order_id" name="existing_order_id" required>
+	            <!-- Order IDs will be populated dynamically -->
+	        </select><br><br>
+	
+	        <label for="update_shipping_address">Shipping Address:</label>
+	        <textarea id="update_shipping_address" name="update_shipping_address" required></textarea><br><br>
+	
+	        <label for="update_status">Order Status:</label>
+	        <select id="update_status" name="update_status" required>
+	            <option value="Pending">Pending</option>
+	            <option value="Shipped">Shipped</option>
+	            <option value="Delivered">Delivered</option>
+	            <option value="Cancelled">Cancelled</option>
+	        </select><br><br>
+	
+	        <label for="update_payment_status">Payment Status:</label>
+	        <select id="update_payment_status" name="update_payment_status" required>
+	            <option value="Paid">Paid</option>
+	            <option value="Pending">Pending</option>
+	        </select><br><br>
+	
+	        <label for="update_product_id">Product:</label>
+	        <select id="update_product_id" name="update_product_id" required>
+	            <!-- Options will be populated dynamically -->
+	        </select><br><br>
+	
+	        <label for="update_quantity">Quantity:</label>
+	        <input type="number" id="update_quantity" name="update_quantity" required><br><br>
+	
+	        <button type="button" onclick="updateItem()">Add/Update Item</button><br><br>
+	
+	        <h3>Order Items:</h3>
+	        <ul id="updateOrderItemsList">
+	            <!-- Items will be dynamically added here -->
+	        </ul>
+	
+	        <h3>Total Amount: <span id="updateTotalAmount">0.00</span></h3>
+	
+	        <button type="submit">Update Order</button>
+	        <button type="button" onclick="toggleForm('update-order-form')">Close</button>
+	    </form>
+	</div>
+
 
     <!-- Search Bar -->
     <div class="order-container">
