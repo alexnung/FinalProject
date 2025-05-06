@@ -160,16 +160,16 @@ def manage_products():
             return jsonify(cursor.fetchall())
         elif request.method == 'POST':
             data = request.get_json()
-            required_fields = ['product_name', 'unit_price', 'category_id']
+            required_fields = ['product_name', 'unit_price', 'category_id','reorder_level']
             if not validate_data(data, required_fields):
                 return error_response("Missing required fields.")
             query = """
-            INSERT INTO Products (product_name, description, quantity_in_stock, unit_price, category_id)
-            VALUES (%s, %s, %s, %s, %s);
+            INSERT INTO Products (product_name, description, quantity_in_stock, unit_price, category_id, reorder_level)
+            VALUES (%s, %s, %s, %s, %s, %s);
             """
             cursor.execute(query, (
                 data['product_name'], data.get('description'), data.get('quantity_in_stock', 0),
-                data['unit_price'], data['category_id']
+                data['unit_price'], data['category_id'], data['reorder_level']
             ))
             connection.commit()
             return jsonify({'message': 'Product created successfully.', 'product_id': cursor.lastrowid}), 201
