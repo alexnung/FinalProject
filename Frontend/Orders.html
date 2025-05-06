@@ -158,11 +158,82 @@
     <div class="page-header">
         <h1>Orders</h1>
         <div>
-        <a href="#" class="new-btn">New Order</a>
-        <a href="#" class="new-btn">Update Order</a>
-        <a href="#" class="new-btn">Delete Order</a>
+        <button id="createOrderBtn" class="btn">Create Order</button>
+		<button id="updateOrderBtn" class="btn">Update Order</button>
         </div>
     </div>
+    
+    <!-- Order Form -->
+	<div id="orderForm" class="form-container" style="display: none;">
+	    <h2 id="formTitle">Order Form</h2>
+	    <form id="orderFormElement">
+	        <label for="customerId">Customer ID:</label>
+	        <input type="number" id="customerId" name="customerId" required>
+	        
+	        <label for="status">Status:</label>
+	        <select id="status" name="status">
+	            <option value="Pending">Pending</option>
+	            <option value="Completed">Completed</option>
+	            <option value="Cancelled">Cancelled</option>
+	        </select>
+	
+	        <label for="paymentStatus">Payment Status:</label>
+	        <select id="paymentStatus" name="paymentStatus">
+	            <option value="Unpaid">Unpaid</option>
+	            <option value="Paid">Paid</option>
+	            <option value="Refunded">Refunded</option>
+	        </select>
+	
+	        <label for="shippingAddress">Shipping Address:</label>
+	        <input type="text" id="shippingAddress" name="shippingAddress" required>
+	
+	        <h3>Order Items</h3>
+	        <div id="orderItemsContainer"></div>
+	        <button type="button" id="addOrderItemBtn">Add Item</button>
+	
+	        <div class="form-actions">
+	            <button type="submit" id="saveOrderBtn">Save</button>
+	            <button type="button" id="cancelOrderBtn">Cancel</button>
+	        </div>
+	    </form>
+	</div>
+    
+	<!-- Modal or Form to Create/Update Order -->
+	<div id="orderForm" style="display: none;">
+	    <h3 id="formTitle">Create Order</h3>
+	    <form id="orderFormElement">
+	        <label for="orderId">Order ID (for update only):</label>
+	        <select id="orderId" name="orderId">
+	            <!-- Existing Order IDs will be populated here -->
+	        </select><br>
+	
+	        <label for="customerId">Customer ID:</label>
+	        <input type="number" id="customerId" name="customerId" required><br>
+	
+	        <label for="status">Status:</label>
+	        <select id="status" name="status">
+	            <option value="Pending">Pending</option>
+	            <option value="Shipped">Shipped</option>
+	            <option value="Delivered">Delivered</option>
+	        </select><br>
+	
+	        <label for="paymentStatus">Payment Status:</label>
+	        <select id="paymentStatus" name="paymentStatus">
+	            <option value="Paid">Paid</option>
+	            <option value="Pending">Pending</option>
+	        </select><br>
+	
+	        <label for="shippingAddress">Shipping Address:</label>
+	        <textarea id="shippingAddress" name="shippingAddress" required></textarea><br>
+	
+	        <h4>Order Items:</h4>
+	        <div id="orderItemsContainer">
+	            <!-- Order Items will be populated here -->
+	        </div>
+	
+	        <button type="submit">Save</button>
+	    </form>
+	</div>
 
     <!-- Search Bar -->
     <div class="order-container">
@@ -181,6 +252,7 @@
                 <th>Total Amount</th>
                 <th>Payment Status</th>
                 <th>Shipping Address</th>
+                <th>Actions</th>
             </tr>
 	        </thead>
 	        <tbody id="orders-table-body">
@@ -190,5 +262,6 @@
     </div>
     <script src="JS/search.js"></script>
     <script src="JS/orders.js"></script>
+    <script src="JS/orders_api_requests.js"></script>
 </body>
 </html>
