@@ -227,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateProductModal = document.getElementById('updateProductModal'); // The modal element
     const cancelUpdateBtn = document.getElementById('cancelUpdateBtn'); // Button to close the modal
     const apiBaseUrl = 'http://localhost:5000/api/products'; // Update to your API URL
+	const apiBaseUrl2 = 'http://localhost:5000/api/product_categories'; // Update to your API URL
 
     const fetchProducts = async () => {
         try {
@@ -246,61 +247,139 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching products:', error);
         }
     };
+	
+	const fetchCategories = async () => {
+	    try {
+	        const response = await fetch(apiBaseUrl2);
+	        if (!response.ok) throw new Error('Failed to fetch product categories');
+	        const categories = await response.json();
 
-    const populateForm = async (productId) => {
-        try {
-            const response = await fetch(`${apiBaseUrl}/${productId}`);
-            if (!response.ok) throw new Error('Failed to fetch product details');
-            const product = await response.json();
+	        const categoryDropdown = document.getElementById('categoryDropdown');
+	        if (!categoryDropdown) throw new Error('Dropdown element not found');
 
-            document.getElementById('productName').value = product.product_name;
-            document.getElementById('description').value = product.description;
-            document.getElementById('quantityInStock').value = product.quantity_in_stock;
-            document.getElementById('unitPrice').value = product.unit_price;
-            document.getElementById('reorderLevel').value = product.reorder_level;
+	        // Clear existing options
+	        categoryDropdown.innerHTML = '<option value="">Select Category</option>';
 
-            console.log('Form populated for product:', productId);
-        } catch (error) {
-            console.error('Error fetching product details:', error);
-        }
-    };
+	        // Populate dropdown with categories
+	        categories.forEach(category => {
+	            const option = document.createElement('option');
+	            option.value = category.category_id; // Set the option value to the category ID
+	            option.textContent = category.category_name; // Set the display text to the category name
+	            categoryDropdown.appendChild(option);
+	        });
 
-    updateProductForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        console.log('Update product form submitted');
+	        console.log('Categories fetched and dropdown populated');
+	    } catch (error) {
+	        console.error('Error fetching product categories:', error);
+	    }
+	};
 
-        const formData = new FormData(updateProductForm);
-        const productId = productDropdown.value;
 
-        if (!productId) {
-            alert('Please select a product to update.');
-            return;
-        }
+	const populateForm = async (productId) => {
+	    try {
+	        const response = await fetch(`${apiBaseUrl}/${productId}`);
+	        if (!response.ok) throw new Error('Failed to fetch product details');
+	        const product = await response.json();
 
-        const payload = {
-            product_name: formData.get('product_name'),
-            description: formData.get('description'),
-            quantity_in_stock: formData.get('quantity_in_stock'),
-            unit_price: formData.get('unit_price'),
-            reorder_level: formData.get('reorder_level')
-        };
+	        // Populate the form fields with product details
+	        document.getElementById('productName').value = product.product_name;
+	        document.getElementById('description').value = product.description;
+	        document.getElementById('quantityInStock').value = product.quantity_in_stock;
+	        document.getElementById('unitPrice').value = product.unit_price;
+	        document.getElementById('reorderLevel').value = product.reorder_level;
 
-        try {
-            const response = await fetch(`${apiBaseUrl}/${productId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+	        // Populate the category dropdown
+			console.log('Populating category dropdown...');
+	        const categoryDropdown = document.getElementById('categoryDropdown');
+	        const responseCategories = await fetch('http://127.0.0.1:5000/api/product_categories');
+			console.log('Response status:', responseCategories.status);
+	        if (!responseCategories.ok) throw new Error('Failed to fetch categories');
+	        const categories = await responseCategories.json();
+			console.log('Fetched categories:', categories);
 
-            if (!response.ok) throw new Error('Failed to update product');
-            alert('Product updated successfully');
-            updateProductModal.style.display = 'none'; // Close modal after successful update
-            console.log('Product updated:', productId);
-        } catch (error) {
-            console.error('Error updating product:', error);
-            alert('Failed to update product');
-        }
-    });
+	        // Clear the existing options in the dropdown
+	        categoryDropdown.innerHTML = '';
+
+	        // Add a default "Select Category" option
+	        const defaultOption = document.createElement('option');
+	        defaultOption.value = '';
+	        defaultOption.textContent = 'Select Category';
+	        categoryDropdown.appendChild(defaultOption);
+
+	        // Populate the dropdown with categories
+	        categories.forEach((category) => {
+	            const option = document.createElement('option');
+	            option.value = category.category_id;
+	            option.textContent = category.category_name;
+	            categoryDropdown.appendChild(option);
+	        });
+
+	        // Set the dropdown to the product's category
+	        categoryDropdown.value = product.category_id;
+
+	    } catch (error) {
+	        console.error('Error fetching product details:', error);
+	    }
+	};
+
+
+
+
+	updateProductForm.addEventListener('submit', async (e) => {
+	    e.preventDefault();
+	    console.log('Update product form submitted');
+
+	    const formData = new FormData(updateProductForm);
+	    const productId = productDropdown.value;
+
+	    if (!productId) {
+	        alert('Please select a product to update.');
+	        return;
+	    }
+
+	    try {
+	        // Fetch the current product details
+	        const currentProductResponse = await fetch(`${apiBaseUrl}/${productId}`);
+	        if (!currentProductResponse.ok) throw new Error('Failed to fetch current product details');
+	        const currentProduct = await currentProductResponse.json();
+
+	        // Prepare the payload with existing values as fallback if fields are left blank
+	        const payload = {
+	            product_name: formData.get('product_name') || currentProduct.product_name,  // Use existing if blank
+	            description: formData.get('description') || currentProduct.description,  // Use existing if blank
+	            quantity_in_stock: formData.get('quantity_in_stock') || currentProduct.quantity_in_stock,  // Use existing if blank
+	            unit_price: formData.get('unit_price') || currentProduct.unit_price,  // Use existing if blank
+	            reorder_level: formData.get('reorder_level') || currentProduct.reorder_level,  // Use existing if blank
+	            category_id: formData.get('category_id') || currentProduct.category_id,  // Use existing if blank
+	        };
+
+	        // Prepare the payload with non-empty fields only
+	        const filteredPayload = {};
+	        for (const key in payload) {
+	            if (payload[key] !== '' && payload[key] !== null && payload[key] !== undefined) {
+	                filteredPayload[key] = payload[key];
+	            }
+	        }
+
+	        // Send the update request
+	        const response = await fetch(`${apiBaseUrl}/${productId}`, {
+	            method: 'PUT',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify(filteredPayload),
+	        });
+
+	        if (!response.ok) throw new Error('Failed to update product');
+	        alert('Product updated successfully');
+	        updateProductModal.style.display = 'none'; // Close modal after successful update
+	        console.log('Product updated:', productId);
+	    } catch (error) {
+	        console.error('Error updating product:', error);
+	        alert('Failed to update product');
+	    }
+	});
+
+
+
 
     productDropdown.addEventListener('change', () => {
         const selectedProductId = productDropdown.value;
@@ -323,5 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fetchProducts();
+	fetchCategories();
 });
+
 

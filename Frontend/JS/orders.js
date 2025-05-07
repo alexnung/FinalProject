@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${new Date(order.order_date).toLocaleDateString()}</td>
 						<td>${order.customer_id}</td>
                         <td>${order.status}</td>
-                        <td>${totalAmount.toFixed(2)}</td>
+                        <td>£${totalAmount.toFixed(2)}</td>
                         <td>${order.payment_status}</td>
                         <td>${order.shipping_address}</td>
                     `;
