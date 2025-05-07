@@ -233,7 +233,7 @@
 	                </tr>
 	                <tr>
 	                    <td><label for="unitPrice">Unit Price:</label></td>
-	                    <td><input type="number" id="unitPrice" name="unit_price" required></td>
+	                    <td><input type="number" id="unitPrice" name="unit_price" required step="0.01"></td>
 	                </tr>
 	                <tr>
 	                    <td><label for="reorderLevel">Reorder Level:</label></td>
@@ -257,6 +257,51 @@
 	        </form>
 	    </div>
 	</div>
+	
+	<div id="updateProductModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Update Product</h2>
+        <form id="updateProductForm">
+            <table>
+                <tr>
+                    <td><label for="productDropdown">Select Product:</label></td>
+                    <td>
+                        <select id="productDropdown" name="product_id" required>
+                            <!-- Product options will be dynamically populated -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="productName">Product Name:</label></td>
+                    <td><input type="text" id="productName" name="product_name" required></td>
+                </tr>
+                <tr>
+                    <td><label for="description">Description:</label></td>
+                    <td><textarea id="description" name="description" required></textarea></td>
+                </tr>
+                <tr>
+                    <td><label for="quantityInStock">Quantity in Stock:</label></td>
+                    <td><input type="number" id="quantityInStock" name="quantity_in_stock" required></td>
+                </tr>
+                <tr>
+                    <td><label for="unitPrice">Unit Price:</label></td>
+                    <td><input type="number" id="unitPrice" name="unit_price" required step="0.01"></td>
+                </tr>
+                <tr>
+                    <td><label for="reorderLevel">Reorder Level:</label></td>
+                    <td><input type="number" id="reorderLevel" name="reorder_level" required></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit">Update Product</button>
+                        <button type="button" id="cancelUpdateBtn">Cancel</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+	</div>
+
 
     <!-- Search Bar -->
     <div class="product-container">

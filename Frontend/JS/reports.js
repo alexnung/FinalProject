@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to delete a report
     const deleteReport = async (reportId) => {
         try {
-            const response = await fetch(`${apiReportsUrl}?report_id=${reportId}`, {
+            const response = await fetch(`${apiReportsUrl}/${reportId}`, {
                 method: 'DELETE',
             });
 

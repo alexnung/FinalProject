@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to delete an order
     const deleteOrder = async (orderId) => {
         try {
-            const response = await fetch(`${apiUrl}?order_id=${orderId}`, {
+            const response = await fetch(`${apiUrl}/${orderId}`, {
                 method: 'DELETE',
             });
 
