@@ -222,3 +222,202 @@ document.addEventListener('DOMContentLoaded', () => {
 	    }
 	});
 
+	document.addEventListener('DOMContentLoaded', () => {
+		    const apiUrlOrders = 'http://127.0.0.1:5000/api/orders';
+		    const apiUrlProducts = 'http://127.0.0.1:5000/api/products';
+
+		    const updateOrderBtn = document.getElementById('updateOrderBtn');
+		    const updateOrderModal = document.getElementById('updateOrderModal');
+		    const cancelUpdateBtn = document.getElementById('cancelUpdateBtn');
+		    const orderIdSelect = document.getElementById('update_order_id');
+		    const productSelect = document.getElementById('update_product_id');
+		    const addProductBtn = document.getElementById('addProductBtn');
+		    const orderProductsTable = document.getElementById('orderProductsTable').getElementsByTagName('tbody')[0];
+		    const totalAmountInput = document.getElementById('update_total_amount');
+		    const updateOrderForm = document.getElementById('updateOrderForm');
+
+		    let selectedProducts = []; // Array to store products added to the order
+		    let products = []; // Store the fetched products
+
+		    // Open the update order modal
+		    updateOrderBtn.addEventListener('click', () => {
+		        updateOrderModal.style.display = 'flex';
+		        fetchOrders(); // Fetch and populate orders
+		        fetchProducts(); // Fetch and populate products
+		    });
+
+		    // Close the update order modal
+		    cancelUpdateBtn.addEventListener('click', () => {
+		        updateOrderModal.style.display = 'none';
+		    });
+
+		    // Fetch and populate orders dropdown
+		    const fetchOrders = async () => {
+		        try {
+		            orderIdSelect.innerHTML = '<option value="">Select an Order</option>'; // Clear dropdown
+		            const response = await fetch(apiUrlOrders);
+		            const orders = await response.json();
+		            console.log('Orders fetched:', orders); // Debugging line
+		            orders.forEach(order => {
+		                const option = document.createElement('option');
+		                option.value = order.order_id;
+		                option.textContent = `Order #${order.order_id}`;
+		                orderIdSelect.appendChild(option);
+		            });
+		        } catch (error) {
+		            console.error('Error fetching orders:', error);
+		        }
+		    };
+
+		    // Fetch and populate products dropdown
+		    const fetchProducts = async () => {
+		        try {
+		            const response = await fetch(apiUrlProducts);
+		            const productData = await response.json();
+		            console.log('Products fetched:', productData); // Debugging line
+		            products = productData; // Store products in the products array
+		            populateProductSelect(); // Populate the product dropdown after fetching
+		        } catch (error) {
+		            console.error('Error fetching products:', error);
+		        }
+		    };
+
+		    // Populate the product select dropdown
+		    const populateProductSelect = () => {
+		        if (!productSelect) {
+		            console.error("product_id element is missing in the HTML.");
+		            return;
+		        }
+
+		        // Debugging the state of the products array
+		        console.log('Products array:', products);
+
+		        // Clear existing options in the product dropdown
+		        productSelect.innerHTML = "";
+
+		        // Add default option
+		        const defaultOption = document.createElement("option");
+		        defaultOption.value = "";
+		        defaultOption.textContent = "Select a product";
+		        productSelect.appendChild(defaultOption);
+
+		        // Add product options dynamically
+		        products.forEach(product => {
+		            const option = document.createElement("option");
+		            option.value = product.product_id;
+		            option.textContent = `${product.product_name} - $${product.unit_price}`;
+		            productSelect.appendChild(option);
+		        });
+
+		        // Debugging if the dropdown is populated
+		        console.log('Dropdown populated with products');
+		    };
+
+		    // Add product to the order
+		    addProductBtn.addEventListener('click', () => {
+		        const productId = document.getElementById('update_product_id').value;
+		        const quantity = document.getElementById('update_quantity').value;
+
+		        if (!productId || !quantity) {
+		            alert('Please select a product and quantity.');
+		            return;
+		        }
+
+		        const selectedProduct = {
+		            product_id: productId,
+		            quantity: quantity
+		        };
+
+		        selectedProducts.push(selectedProduct);
+		        updateOrderProductList();
+		        updateTotalAmount();
+		    });
+
+		    // Update the list of products in the order
+		    const updateOrderProductList = () => {
+		        orderProductsTable.innerHTML = '';
+		        selectedProducts.forEach(product => {
+		            const row = document.createElement('tr');
+		            row.innerHTML = `
+		                <td>${product.product_id}</td>
+		                <td>${product.quantity}</td>
+		                <td><button class="removeProductBtn">Remove</button></td>
+		            `;
+		            orderProductsTable.appendChild(row);
+
+		            row.querySelector('.removeProductBtn').addEventListener('click', () => {
+		                selectedProducts = selectedProducts.filter(p => p !== product);
+		                updateOrderProductList();
+		                updateTotalAmount();
+		            });
+		        });
+		    };
+
+		    // Calculate the total amount based on selected products and quantities
+		    const updateTotalAmount = async () => {
+		        let totalAmount = 0;
+
+		        for (const product of selectedProducts) {
+		            const productDetails = await fetchProductDetails(product.product_id);
+		            totalAmount += productDetails.unit_price * product.quantity;
+		        }
+
+		        totalAmountInput.value = totalAmount.toFixed(2);
+		    };
+
+		    // Fetch product details (e.g., price) for calculating total amount
+		    const fetchProductDetails = async (productId) => {
+		        try {
+		            const response = await fetch(`${apiUrlProducts}/${productId}`);
+		            const product = await response.json();
+		            return product;
+		        } catch (error) {
+		            console.error('Error fetching product details:', error);
+		            return { unit_price: 0 };
+		        }
+		    };
+
+		    // Submit the update order form
+		    updateOrderForm.addEventListener('submit', async (e) => {
+		        e.preventDefault();
+
+		        const orderId = orderIdSelect.value;
+		        const customerId = document.getElementById('customer_id').value;
+
+		        if (!orderId) {
+		            alert('Please select an order to update.');
+		            return;
+		        }
+
+				const orderData = {
+				    customer_id: document.getElementById("update_customer_id").value.trim(), // Customer ID from input
+				    status: document.getElementById("update_status").value, // Status from the dropdown
+				    total_amount: parseFloat(document.getElementById("update_total_amount").value.trim()), // Total amount from input, parsed to a float
+				    payment_status: document.getElementById("update_payment_status").value, // Payment status from the dropdown
+				    shipping_address: document.getElementById("update_shipping_address")?.value.trim() || null, // Optional shipping address, default to null if not present
+				};
+
+
+
+
+		        try {
+		            const response = await fetch(`${apiUrlOrders}/${orderId}`, {
+		                method: 'PUT',
+		                headers: {
+		                    'Content-Type': 'application/json'
+		                },
+		                body: JSON.stringify(orderData)
+		            });
+
+		            if (response.ok) {
+		                alert('Order updated successfully!');
+		                updateOrderModal.style.display = 'none';
+		            } else {
+		                alert('Failed to update order.');
+		            }
+		        } catch (error) {
+		            console.error('Error updating order:', error);
+		            alert('Error updating order.');
+		        }
+		    });
+		});

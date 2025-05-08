@@ -172,6 +172,41 @@
 		    resize: vertical;
 		}
         
+        #updateOrderModal {
+		    display: none;
+		    position: fixed;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    width: 90%;
+		    max-width: 500px; /* Restrict maximum width */
+		    max-height: 80%; /* Restrict maximum height */
+		    background-color: #fff;
+		    border-radius: 8px;
+		    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+		    padding: 20px;
+		    overflow-y: auto; /* Scrollable content if necessary */
+		    z-index: 1000;
+		}
+		
+		/* Modal header */
+		#updateOrderModal h2 {
+		    margin-top: 0;
+		    text-align: center;
+		    font-size: 1.5rem;
+		}
+		
+		/* Overlay background */
+		.modal-overlay {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0.5);
+		    z-index: 999;
+		}
+
     </style>
 </head>
 <body>
@@ -251,7 +286,90 @@
 	        <button type="button" onclick="toggleCreateOrderForm()">Close</button>
 	    </form>
 	</div>
-    
+
+	<!-- Update Order Modal -->
+	<div id="updateOrderModal" class="modal">
+	    <div class="modal-content">
+	        <h2>Update Order</h2>
+	        <form id="updateOrderForm">
+	            <!-- Order ID Dropdown -->
+	            <label for="update_order_id">Order ID:</label>
+	            <select id="update_order_id" name="update_order_id" required>
+	                <option value="">Select Order</option>
+	            </select>
+	            <br><br>
+	
+	            <!-- Customer ID (optional) -->
+	            <label for="update_customer_id">Customer ID:</label>
+	            <input type="text" id="update_customer_id" name="update_customer_id" required>
+	            <br><br>
+	
+	            <!-- Order Status Dropdown -->
+	            <label for="update_status">Order Status:</label>
+	            <select id="update_status" name="update_status" required>
+	                <option value="Pending">Pending</option>
+	                <option value="Shipped">Shipped</option>
+	                <option value="Delivered">Delivered</option>
+	                <option value="Cancelled">Cancelled</option>
+	            </select>
+	            <br><br>
+	
+	            <!-- Payment Status Dropdown -->
+	            <label for="update_payment_status">Payment Status:</label>
+	            <select id="update_payment_status" name="update_payment_status" required>
+	                <option value="Paid">Paid</option>
+	                <option value="Pending">Pending</option>
+	                <option value="Cancelled">Cancelled</option>
+	            </select>
+	            <br><br>
+	
+	            <!-- Shipping Address -->
+	            <label for="update_shipping_address">Shipping Address:</label>
+	            <input type="text" id="update_shipping_address" name="update_shipping_address">
+	            <br><br>
+	
+	            <!-- Product Dropdown and Quantity for Adding Products -->
+	            <label for="update_product_id">Product:</label>
+	            <select id="update_product_id" name="update_product_id" required>
+	                <option value="">Select Product</option>
+	            </select>
+	            <br><br>
+	
+	            <label for="update_quantity">Quantity:</label>
+	            <input type="number" id="update_quantity" name="update_quantity" required>
+	            <br><br>
+	
+	            <!-- Add Product to Order Button -->
+	            <button type="button" id="addProductBtn" class="new-btn">Add Product</button>
+	            <br><br>
+	
+	            <!-- Product List for Order -->
+	            <h3>Added Products:</h3>
+	            <table id="orderProductsTable">
+	                <thead>
+	                    <tr>
+	                        <th>Product</th>
+	                        <th>Quantity</th>
+	                        <th>Action</th>
+	                    </tr>
+	                </thead>
+	                <tbody></tbody>
+	            </table>
+	
+	            <br><br>
+	
+	            <!-- Total Amount -->
+	            <label for="update_total_amount">Total Amount:</label>
+	            <input type="text" id="update_total_amount" name="update_total_amount" readonly>
+	            <br><br>
+	
+	            <!-- Submit and Cancel Buttons -->
+	            <button type="submit" class="new-btn">Update Order</button>
+	            <button type="button" id="cancelUpdateBtn" class="new-btn">Cancel</button>
+	        </form>
+	    </div>
+	</div>
+
    
     <!-- Search Bar -->
     <div class="order-container">
