@@ -1,5 +1,5 @@
 -- Insert test data into Users Table
-INSERT INTO Users (username, password_hash, role, email, first_name, last_name)
+INSERT INTO Users (username, password, role, email, first_name, last_name)
 VALUES 
     ('admin', 'hashed_password1', 'Admin', 'admin@example.com', 'Alice', 'Admin'),
     ('manager', 'hashed_password2', 'Manager', 'manager@example.com', 'Bob', 'Manager'),
