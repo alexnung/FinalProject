@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import mysql.connector
+import json
 from mysql.connector import Error
 from flask_cors import CORS,cross_origin
 
@@ -430,7 +431,7 @@ def manage_reports(report_id=None):
             INSERT INTO Reports (report_type, user_id, report_data)
             VALUES (%s, %s, %s);
             """
-            cursor.execute(query, (data['report_type'], data['user_id'], data['report_data']))
+            cursor.execute(query, (data['report_type'], data['user_id'], json.dumps(data['report_data'])))
             connection.commit()
             return jsonify({'message': 'Report created successfully.', 'report_id': cursor.lastrowid}), 201
 
