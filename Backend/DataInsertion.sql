@@ -3,8 +3,7 @@ INSERT INTO Users (username, password_hash, role, email, first_name, last_name)
 VALUES 
     ('admin', 'hashed_password1', 'Admin', 'admin@example.com', 'Alice', 'Admin'),
     ('manager', 'hashed_password2', 'Manager', 'manager@example.com', 'Bob', 'Manager'),
-    ('staff1', 'hashed_password3', 'Staff', 'staff1@example.com', 'Charlie', 'Staff'),
-    ('customer1', 'hashed_password4', 'Staff', 'customer1@example.com', 'Diana', 'Customer');
+    ('staff1', 'hashed_password3', 'Staff', 'staff1@example.com', 'Charlie', 'Staff')
 
 -- Insert test data into Product_Categories Table
 INSERT INTO Product_Categories (category_name, description)
