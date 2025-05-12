@@ -3,8 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Fetch products and orders data
             const [productsResponse, ordersResponse] = await Promise.all([
-                fetch('http://127.0.0.1:5000/api/products'),
-                fetch('http://127.0.0.1:5000/api/orders')
+                fetch('http://127.0.0.1:5000/api/products', {
+					method: 'GET',
+				    credentials: 'include',}),
+                fetch('http://127.0.0.1:5000/api/orders', {
+					method: 'GET',
+				    credentials: 'include',})
             ]);
 
             // Check if both API responses are OK
@@ -17,7 +21,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const products = await productsResponse.json();
             const orders = await ordersResponse.json();
+			
+			// Log raw response to debug
+			console.log('Products:', products);
+			console.log('Orders:', orders);
+			
+			// Check if they are arrays
+			if (!Array.isArray(products)) {
+			    throw new Error('Products response is not an array');
+			}
+			if (!Array.isArray(orders)) {
+			    throw new Error('Orders response is not an array');
+			}
+			
+			const rawProducts = await productsResponse.text();
+			const rawOrders = await ordersResponse.text();
+			console.log('Raw Products Response:', rawProducts);
+			console.log('Raw Orders Response:', rawOrders);
+			
+			// Inside fetchAndPopulateDashboard
+			const totalInventoryElem = document.getElementById('total-inventory-value');
+			if (totalInventoryElem) {
+			    totalInventoryElem.textContent = `$${totalInventoryValue}`;
+			} else {
+			    console.error('Element #total-inventory-value not found in DOM.');
+			}
 
+			const stockOnHandElem = document.getElementById('stock-on-hand');
+			if (stockOnHandElem) {
+			    stockOnHandElem.textContent = `${stockOnHand} items`;
+			} else {
+			    console.error('Element #stock-on-hand not found in DOM.');
+			}
+
+			const lowStockElem = document.getElementById('low-stock');
+			if (lowStockElem) {
+			    lowStockElem.textContent = `${lowStock} items`;
+			} else {
+			    console.error('Element #low-stock not found in DOM.');
+			}
+
+			const outOfStockElem = document.getElementById('out-of-stock');
+			if (outOfStockElem) {
+			    outOfStockElem.textContent = `${outOfStock} items`;
+			} else {
+			    console.error('Element #out-of-stock not found in DOM.');
+			}
+
+			const pendingOrdersElem = document.getElementById('pending-orders');
+			if (pendingOrdersElem) {
+			    pendingOrdersElem.textContent = `${pendingOrders} orders`;
+			} else {
+			    console.error('Element #pending-orders not found in DOM.');
+			}
+			
             // Total inventory value
             const totalInventoryValue = products.reduce((total, product) => total + (product.unit_price * product.quantity_in_stock), 0).toFixed(2);
 
@@ -66,7 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchAndPopulateOrders = async () => {
         try {
             // Fetch the orders
-            const ordersResponse = await fetch('http://127.0.0.1:5000/api/orders'); // Adjust the API endpoint
+            const ordersResponse = await fetch('http://127.0.0.1:5000/api/orders',{
+				method: 'GET',
+				credentials: 'include',}); // Adjust the API endpoint
             if (!ordersResponse.ok) {
                 throw new Error(`HTTP error! Status: ${ordersResponse.status}`);
             }

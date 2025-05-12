@@ -1,12 +1,27 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session, render_template
+from flask_login import LoginManager, login_required, UserMixin, login_user, logout_user
 import mysql.connector
 import json
+import requests
 from mysql.connector import Error
 from flask_cors import CORS,cross_origin
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
+app.secret_key = "your_secret_key"
 
-CORS(app)
+CORS(
+    app,
+    supports_credentials=True,
+    origins=["http://127.0.0.1:5000"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "http://127.0.0.1:5500"],
+    allow_headers=["Content-Type", "Authorization"],
+)
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Utility function to create a database connection
 def create_connection():
@@ -31,12 +46,146 @@ def error_response(message, status_code=400):
 def validate_data(data, required_fields):
     return all(field in data for field in required_fields)
 
+# Define a simple User class
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+# User loader callback for loading user from the session
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
+# Dummy user authentication route (for testing purposes)
+@app.route('/api/login', methods=['POST'])
+@cross_origin()
+def login():
+    username = request.json.get("username")
+    password = request.json.get("password")
+
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+
+        if user and user['password'] == password:  # Ensure passwords are hashed in production!
+            user_obj = User(id=user['username'])
+            login_user(user_obj)
+            
+            # Store user information in the session
+            session['user_id'] = user['username']
+            
+            # Create and return the response with the headers
+            response = jsonify({"message": "Login successful!"})
+            response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin"))
+            response.headers.add("Access-Control-Allow-Credentials", "true")
+            print(session)  # Debug session state
+            return response, 200
+        return jsonify({"message": "Invalid credentials!"}), 401
+    return jsonify({"message": "Database connection failed!"}), 500
+
+# Protected route that requires login
+@app.route('/api/dashboard',)
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+    
+@app.route('/api/orders',)
+@login_required
+def orders():
+    return render_template('orders.html')
+    
+@app.route('/api/invoices',)
+@login_required
+def invoices():
+    return render_template('invoices.html')    
+
+import requests  # Import requests to fetch data from APIs
+
+@app.route('/api/products')
+@login_required
+def products():
+    try:
+        # URLs for the APIs
+        products_api_url = "http://127.0.0.1:5000/api/products"
+        categories_api_url = "http://127.0.0.1:5000/api/product_categories"
+
+        # Fetch data from APIs
+        products_response = requests.get(products_api_url)
+        categories_response = requests.get(categories_api_url)
+
+        # Check if both API requests were successful
+        if products_response.status_code == 200 and categories_response.status_code == 200:
+            products_data = products_response.json()  # Parse JSON data for products
+            categories_data = categories_response.json()  # Parse JSON data for categories
+
+            # Render the template and pass the data
+            return render_template('products.html', products=products_data, categories=categories_data)
+        else:
+            # Handle API errors
+            return jsonify({
+                "error": "Failed to fetch data from one or more APIs",
+                "products_status": products_response.status_code,
+                "categories_status": categories_response.status_code
+            }), 500
+    except Exception as e:
+        # Handle any unexpected errors
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/', methods=['GET'])
+@login_required
+def inventory():
+    try:
+        # URLs for the external APIs
+        products_api = "http://127.0.0.1:5000/api/products"
+        categories_api = "http://127.0.0.1:5000/api/product_categories"
+
+        # Fetch data from the external APIs
+        products_response = requests.get(products_api)
+        categories_response = requests.get(categories_api)
+
+        # Check if the API calls were successful
+        if products_response.status_code == 200 and categories_response.status_code == 200:
+            products = products_response.json()
+            categories = categories_response.json()
+
+            # Pass the data to the template
+            return render_template('inventory.html', products=products, categories=categories)
+        else:
+            # Handle API errors
+            return jsonify({"message": "Failed to fetch data from APIs!"}), 500
+
+    except requests.exceptions.RequestException as e:
+        # Handle connection errors or other issues
+        return jsonify({"message": f"Error fetching data: {str(e)}"}), 500
+
+@app.route('/api/reports',)
+@login_required
+def reports():
+    return render_template('reports.html')
+
+# Logout route
+@app.route('/api/logout')
+@login_required
+def logout():
+    logout_user()
+    return jsonify({"message": "Logged out successfully!"}), 200
+
+# Example of an API route that requires login
+@app.route('/api/orders')
+@login_required
+def get_data():
+    data = {"message": "This is secured data"}
+    return jsonify(data)
+
 ### CRUD for Each Table ###
 
 # 1. Users Table
 @app.route('/api/users', methods=['GET', 'POST'])
 @app.route('/api/users/<string:username>', methods=['GET', 'PUT','DELETE'])
 @cross_origin()
+@login_required
 def manage_users(username=None):
     connection = create_connection()
     if not connection:
@@ -105,6 +254,7 @@ def manage_users(username=None):
 @app.route('/api/product_categories', methods=['GET', 'POST'])
 @app.route('/api/product_categories/<int:category_id>', methods=['GET', 'PUT','DELETE'])
 @cross_origin()
+@login_required
 def manage_category(category_id=None):
     connection = create_connection()
     if not connection:
@@ -175,6 +325,7 @@ def manage_category(category_id=None):
 @app.route('/api/products', methods=['GET', 'POST'])
 @app.route('/api/products/<int:product_id>', methods=['GET', 'PUT', 'DELETE'])
 @cross_origin()
+@login_required
 def manage_products(product_id=None):
     connection = create_connection()
     if not connection:
@@ -251,6 +402,7 @@ def manage_products(product_id=None):
 @app.route('/api/orders', methods=['GET', 'POST'])
 @app.route('/api/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'])
 @cross_origin()
+@login_required
 def manage_orders(order_id=None):
     connection = create_connection()
     if not connection:
@@ -326,6 +478,7 @@ def manage_orders(order_id=None):
 @app.route('/api/order_items', methods=['GET', 'POST'])
 @app.route('/api/order_items/<int:order_item_id>', methods=['GET', 'PUT', 'DELETE'])
 @cross_origin()
+@login_required
 def manage_order_items(order_item_id=None):
     connection = create_connection()
     if not connection:
@@ -401,6 +554,7 @@ def manage_order_items(order_item_id=None):
 @app.route('/api/reports', methods=['GET', 'POST'])
 @app.route('/api/reports/<int:report_id>', methods=['GET', 'PUT', 'DELETE'])
 @cross_origin()
+@login_required
 def manage_reports(report_id=None):
     connection = create_connection()
     if not connection:
@@ -471,6 +625,7 @@ def manage_reports(report_id=None):
 @app.route('/api/invoices', methods=['GET', 'POST'])
 @app.route('/api/invoices/<int:invoice_id>', methods=['GET', 'PUT', 'DELETE'])
 @cross_origin()
+@login_required
 def manage_invoices(invoice_id=None):
     connection = create_connection()
     if not connection:
