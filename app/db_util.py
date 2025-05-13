@@ -12,7 +12,8 @@ DB_CONFIG = {
 def get_connection():
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
-        return connection
+        if connection.is_connected():
+            return connection
     except Error as e:
         print("Error connecting to MySQL:", e)
-        return None
+        raise Exception("Connection failed")  # Raise an exception instead of returning None

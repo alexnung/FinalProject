@@ -58,15 +58,15 @@ def manage_users(username=None):
                 return jsonify(cursor.fetchall())
         elif request.method == 'POST':
             data = request.get_json()
-            required_fields = ['username', 'password_hash', 'role', 'email']
+            required_fields = ['username', 'password', 'role', 'email']
             if not validate_data(data, required_fields):
                 return error_response("Missing required fields.")
             query = """
-            INSERT INTO Users (username, password_hash, role, email, first_name, last_name)
+            INSERT INTO Users (username, password, role, email, first_name, last_name)
             VALUES (%s, %s, %s, %s, %s, %s);
             """
             cursor.execute(query, (
-                data['username'], data['password_hash'], data['role'], 
+                data['username'], data['password'], data['role'], 
                 data['email'], data.get('first_name'), data.get('last_name')
             ))
             connection.commit()
@@ -77,11 +77,11 @@ def manage_users(username=None):
             data = request.get_json()
             query = """
             UPDATE Users
-            SET username = %s, password_hash = %s, role = %s, email = %s, first_name = %s, last_name = %s
+            SET username = %s, password = %s, role = %s, email = %s, first_name = %s, last_name = %s
             WHERE username = %s;
             """
             cursor.execute(query, (
-                data['username'], data['password_hash'], data['role'], 
+                data['username'], data['password'], data['role'], 
                 data['email'], data.get('first_name'), data.get('last_name'), username
             ))
             connection.commit()
@@ -545,4 +545,4 @@ def manage_invoices(invoice_id=None):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True, use_reloader=False)

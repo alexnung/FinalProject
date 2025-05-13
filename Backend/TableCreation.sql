@@ -43,7 +43,7 @@ CREATE TABLE Orders (
     status ENUM('Pending', 'Shipped', 'Delivered','Cancelled') NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     payment_status ENUM('Paid', 'Pending') NOT NULL,
-    shipping_address TEXT NOT NULL
+    shipping_address TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
